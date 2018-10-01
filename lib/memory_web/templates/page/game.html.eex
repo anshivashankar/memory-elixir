@@ -1,0 +1,14 @@
+
+<%# Inspired by: http://www.ccs.neu.edu/home/ntuck/courses/2018/09/cs4550/notes/06-channels/notes.html%>
+<script>
+  window.gameName = "<%= @game %>";
+</script>
+
+<div class="row">
+  <div class="column">
+    <h1>Memory loading...</h1>
+    <div id="root">
+      <p>React app loading...</p>
+    </div>
+  </div>
+</div>
