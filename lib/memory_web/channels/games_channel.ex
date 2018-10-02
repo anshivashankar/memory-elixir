@@ -21,9 +21,19 @@ defmodule MemoryWeb.GamesChannel do
 
   # It is also common to receive messages from the client and
   # broadcast to everyone in the current topic (games:lobby).
-  def handle_in("shout", payload, socket) do
-    broadcast socket, "shout", payload
-    {:noreply, socket}
+  # payload should always be a number, the id of the card picked by the client.
+  def handle_in("guess_card", payload, socket) do
+    game = Memory.guess_card(socket.assigns[:game], payload)
+    socket = assign(socket, :game, game)
+    {:reply, {:ok, %{ "game" => Memory.client_view(game)}}, socket}
+    #broadcast socket, "shout", payload
+    #{:noreply, socket}
+  end
+
+  def handle_in("end_guess", payload, socket) do
+    game = Memory.end_guess(socket.assigns[:game])
+    socket = assign(socket, :game, game)
+    {:reply, {:ok, %{ "game" => Memory.client_view(game)}}, socket}
   end
 
   # Add authorization logic here as required.

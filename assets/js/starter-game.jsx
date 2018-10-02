@@ -25,8 +25,13 @@ class Memory extends React.Component {
     this.setState(view.game);
   }
 
-  sendGuess(card) {
-    this.channel.push("guess", { guessCard: card })
+  sendGuess(id) {
+    this.channel.push("guess_card", id)
+      .receive("ok", this.gotView.bind(this));
+  }
+
+  endGuess() {
+    this.channel.push("end_guess", true)
       .receive("ok", this.gotView.bind(this));
   }
 
@@ -56,65 +61,36 @@ class Memory extends React.Component {
     this.setState(xs);
   }
 
-  getNumClicks() {
-    return this.state.numClicks;
-  }
-
-  add1NumClicks() {
-    let input = this.state.numClicks + 1;
-    let st1 = _.extend(this.state, { numClicks: input });
-    this.setState(st1);
-  }
-
-  markFlipped(index) {
-    let newCard = _.extend(this.state.cards[index], {guessed: true});
-    let xs = this.state.cards.splice(index, 1, newCard); 
-    this.setState({ cards: xs });
-  }
-
   onClickCard(id, index) {
     // do nothing on click if the cards are completed.
-    if(this.state.cards[index].completed || 
+    if(this.state.cards[id].completed || 
        this.getNumberOfGuesses() == 2 ||
-       this.state.cards[index].guessed) {
+       this.state.cards[id].guessed) {
       return;
     }
-    this.markFlipped(index);
-    this.cardMatch(index);
-    this.add1NumClicks();
+    this.sendGuess(id);
+    //this.markFlipped(index);
+    this.cardMatch(id);
+    //this.add1NumClicks();
   }
 
   // deals with if there is a match in cards.
   // If there isn't, it hides both of them.
   // If there is, it adds them to "completed" and they stay up.
   // this does nothing if only one is flipped.
-  cardMatch(index) {
-    let card = this.state.cards[index];
+  cardMatch(id) {
+    let card = this.state.cards[id];
     let matchIndex = this.findGuessed(card);
     if(matchIndex == -1) {
       return; // no other guessed cards, no match.
     }
     let matchCard = this.state.cards[matchIndex];
-
-    // letter matches, set both to complete.
-    if(_.isEqual(card.letter, matchCard.letter)) {
-      let newCard = _.extend(card, {completed: true, guessed: false});
-      let newMatchCard = _.extend(matchCard, {completed: true, guessed: false});
-      let newCards = this.state.cards.splice(index, 1, newCard);
-      newCards = newCards.splice(matchIndex, 1, newMatchCard);
-      this.setState({ cards: newCards});
-    }
-    // letter doesn't match.
-    else {
-      // wait for a sec, then set all guessed to false.
-      setTimeout(
-        () => {
-          let xs = _.map(this.state.cards, (card) => {
-            return _.extend(card, {guessed: false});
-          });
-          this.setState({ cards: xs });
-        },1000);
-    }
+    console.log("", card.letter, " " , matchCard.letter);
+    setTimeout(
+      () => {
+        this.channel.push("end_guess", true)
+          .receive("ok", this.gotView.bind(this));
+      },1000);
   }
   
   // if there's a card that's guessed, return its index.
@@ -141,13 +117,6 @@ class Memory extends React.Component {
     return guessedCount;
   }
 
-  // set all guessed to false.
-  setGuessedToFalse() {
-    let xs = _.map(this.state.cards, (card) => {
-      return _.extend(card, {guessed: false});
-    });
-    this.setState({ cards: xs });
-  }
 
   renderCard(i) {
     let card = this.state.cards[i];
@@ -205,7 +174,7 @@ function DisplayCard(params) {
   //let pos = params.card.pos;
   let id = params.card.id;
   if(flipped == true) {
-  return <button className="buttonAnswer" onClick={() => params.clickCard(id, params.number)}> [{letter}]  </button>;
+  return <button className="buttonAnswer" onClick={() => params.clickCard(id, id)}> [{letter}]  </button>;
   }
   return <button className="buttonGuess" onClick={() => params.clickCard(id, params.number)}> [??] </button>;
 }
