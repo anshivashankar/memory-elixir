@@ -21,7 +21,6 @@ class Memory extends React.Component {
 
   // gotView and sendGuess inspired by: http://www.ccs.neu.edu/home/ntuck/courses/2018/09/cs4550/notes/06-channels/hangman.jsx
   gotView(view) {
-    console.log("new view", view);
     this.setState(view.game);
   }
 
@@ -70,7 +69,6 @@ class Memory extends React.Component {
       return; // no other guessed cards, no match.
     }
     let matchCard = this.state.cards[matchIndex];
-    console.log("", card.letter, " " , matchCard.letter);
     setTimeout(
       () => {
         this.channel.push("end_guess")

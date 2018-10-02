@@ -3,6 +3,7 @@
 <div class="row">
   <div class="column">
     <h1 id="index-page">Join a Game</h1>
-    <p><a href="/game/default">Join "default"</p>
+    <input type="text" id="game">
+    <button type="submit" onClick="location.href='/game/'+document.getElementById('game').value;">Join game</button>
   </div>
 </div>

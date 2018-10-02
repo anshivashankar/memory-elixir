@@ -15,15 +15,7 @@ import socket from "./socket";
 import game_init from "./starter-game";
 
 // This code was inspired from http://www.ccs.neu.edu/home/ntuck/courses/2018/09/cs4550/notes/06-channels/notes.html
-let channel = socket.channel("games:default", {})
-channel.join()
-  .receive("ok", resp => { console.log("Joined successfully", resp) })
-  .receive("error", resp => { console.log("Unable to join", resp) })
 start()
-//$(() => {
-//  let root = $('#root')[0];
-//  game_init(root);
-//});
 
 // This code was inspired from http://www.ccs.neu.edu/home/ntuck/courses/2018/09/cs4550/notes/06-channels/notes.html
 function start() {
@@ -32,9 +24,5 @@ function start() {
     let channel = socket.channel("games:" + window.gameName, {});
     game_init(root, channel);
   }
-
-  
-
-
 }
 
