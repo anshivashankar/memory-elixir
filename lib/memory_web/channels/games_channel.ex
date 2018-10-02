@@ -1,6 +1,8 @@
 defmodule MemoryWeb.GamesChannel do
   use MemoryWeb, :channel
 
+  # join and handle_in methods inspired by: http://www.ccs.neu.edu/home/ntuck/courses/2018/09/cs4550/notes/06-channels/games_channel.ex
+  # as well as 
   def join("games:" <> name, payload, socket) do
     if authorized?(payload) do
       game = Memory.new()
@@ -32,6 +34,12 @@ defmodule MemoryWeb.GamesChannel do
 
   def handle_in("end_guess", payload, socket) do
     game = Memory.end_guess(socket.assigns[:game])
+    socket = assign(socket, :game, game)
+    {:reply, {:ok, %{ "game" => Memory.client_view(game)}}, socket}
+  end
+
+  def handle_in("reset_game", payload, socket) do
+    game = Memory.reset_game(socket.assigns[:game])
     socket = assign(socket, :game, game)
     {:reply, {:ok, %{ "game" => Memory.client_view(game)}}, socket}
   end

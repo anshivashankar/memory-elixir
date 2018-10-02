@@ -1,4 +1,4 @@
-# Inspired by: http://www.ccs.neu.edu/home/ntuck/courses/2018/09/cs4550/notes/06-channels/game.ex
+# functions new, client_view, and guess_card Inspired by: http://www.ccs.neu.edu/home/ntuck/courses/2018/09/cs4550/notes/06-channels/game.ex
 defmodule Memory do
   def new do
     %{
@@ -33,12 +33,6 @@ defmodule Memory do
   def client_view(game) do
     cards = game.cards
     clicks = game.numClicks
-    # here we pass only what the client needs to know.
-    # in this case, we'll only specify:
-    # numClicks (ofc)
-    # cardsFound (list of cards)
-    # cardsGuessed (can only be two)
-    # the board should be able to see these. The cards themselves are the only hidden thing.
     %{
       cards: cards_viewable(cards),
       numClicks: clicks
@@ -99,6 +93,14 @@ defmodule Memory do
       guessed: false,}
     end
     Map.put(game, :cards, cards)
+  end
+
+  # reset the game.
+  def reset_game(game) do
+    %{
+      cards: resetCards(),
+      numClicks: 0
+    }
   end
 
   defp update_guess(game, id) do

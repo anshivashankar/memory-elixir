@@ -48,17 +48,12 @@ class Memory extends React.Component {
         count++;
       }
     }
-    //cards = _.shuffle(cards);
     return cards;
   }
 
   resetState() {
-    let cards = this.resetCards();
-    let xs = {
-      cards: cards,
-      numClicks: 0,
-      };
-    this.setState(xs);
+    this.channel.push("reset_game", true)
+      .receive("ok", this.gotView.bind(this));
   }
 
   onClickCard(id, index) {
@@ -69,15 +64,10 @@ class Memory extends React.Component {
       return;
     }
     this.sendGuess(id);
-    //this.markFlipped(index);
     this.cardMatch(id);
-    //this.add1NumClicks();
   }
 
-  // deals with if there is a match in cards.
-  // If there isn't, it hides both of them.
-  // If there is, it adds them to "completed" and they stay up.
-  // this does nothing if only one is flipped.
+  // sends the "I am done looking" channel push.
   cardMatch(id) {
     let card = this.state.cards[id];
     let matchIndex = this.findGuessed(card);
@@ -171,7 +161,6 @@ class Memory extends React.Component {
 function DisplayCard(params) {
   let letter = params.card.letter;
   let flipped = params.card.guessed || params.card.completed;
-  //let pos = params.card.pos;
   let id = params.card.id;
   if(flipped == true) {
   return <button className="buttonAnswer" onClick={() => params.clickCard(id, id)}> [{letter}]  </button>;
