@@ -59,10 +59,8 @@ defmodule Memory do
       # dont do anything if they try to guess more than 2 cards.
       game
     else
-      newGame = update_guess(game, id)
+      update_guess(game, id)
       |> check_completed(id)
-      #IO.inspect(newGame)
-      #if num_guessed(game.cards, 0) == 2 do
     end
   end
 
@@ -96,7 +94,7 @@ defmodule Memory do
   end
 
   # reset the game.
-  def reset_game(game) do
+  def reset_game() do
     %{
       cards: resetCards(),
       numClicks: 0

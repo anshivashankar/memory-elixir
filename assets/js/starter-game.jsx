@@ -30,11 +30,6 @@ class Memory extends React.Component {
       .receive("ok", this.gotView.bind(this));
   }
 
-  endGuess() {
-    this.channel.push("end_guess", true)
-      .receive("ok", this.gotView.bind(this));
-  }
-
   resetCards() {
     let cards = [];
     let x, y;
@@ -52,7 +47,7 @@ class Memory extends React.Component {
   }
 
   resetState() {
-    this.channel.push("reset_game", true)
+    this.channel.push("reset_game")
       .receive("ok", this.gotView.bind(this));
   }
 
@@ -78,7 +73,7 @@ class Memory extends React.Component {
     console.log("", card.letter, " " , matchCard.letter);
     setTimeout(
       () => {
-        this.channel.push("end_guess", true)
+        this.channel.push("end_guess")
           .receive("ok", this.gotView.bind(this));
       },1000);
   }
