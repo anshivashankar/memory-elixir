@@ -7,7 +7,7 @@
     <title>Memory · Phoenix Framework</title>
     <link rel="stylesheet" href="<%= Routes.static_url(@conn, "/css/app.css") %>"/>
     <script>
-      window.userToken="TODO"
+      window.userToken="<%= @user_token %>";
     </script>
   </head>
   <body>

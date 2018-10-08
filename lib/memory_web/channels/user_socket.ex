@@ -16,8 +16,18 @@ defmodule MemoryWeb.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(_params, socket, _connect_info) do
-    {:ok, socket}
+  #def connect(_params, socket, _connect_info) do
+  #  {:ok, socket}
+  #end
+  # "connect" inspired by: http://www.ccs.neu.edu/home/ntuck/courses/2018/09/cs4550/notes/09-two-players/user_socket.ex
+  def connect(%{"token"=> token}, socket, _connection_info) do
+    case Phoenix.Token.verify(socket, "user socket", token, max_age: 1209600) do
+      {:ok, user} ->
+        IO.puts("socket connect from user = #{user}")
+        {:ok, assign(socket, :user, user)}
+      {:error, _reason} ->
+        :error
+    end
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

@@ -7,6 +7,7 @@ defmodule MemoryWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug MemoryWeb.Plugs.PutUserToken
   end
 
   pipeline :api do
@@ -16,6 +17,7 @@ defmodule MemoryWeb.Router do
   scope "/", MemoryWeb do
     pipe_through :browser # Use the default browser stack
     get "/game/:game", PageController, :game
+    post "/join", PageController, :join
     get "/", PageController, :index
   end
 

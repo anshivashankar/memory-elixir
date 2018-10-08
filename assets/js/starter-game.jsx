@@ -11,9 +11,9 @@ class Memory extends React.Component {
 
   constructor(props) {
     super(props);
-
+    
     this.channel = props.channel;
-    this.state = { cards: this.resetCards(), numClicks: 0 };
+    this.state = { cards: this.resetCards(), numClicks: 0, players: [] };
     this.channel.join()
       .receive("ok", this.gotView.bind(this))
       .receive("error", resp => {console.log("Unable to join", resp)});

@@ -1,9 +1,12 @@
 
-<%# Inspired by: http://www.ccs.neu.edu/home/ntuck/courses/2018/09/cs4550/notes/06-channels/notes.html %>
+<%# Inspired by: http://www.ccs.neu.edu/home/ntuck/courses/2018/09/cs4550/notes/06-channels/notes.html and http://www.ccs.neu.edu/home/ntuck/courses/2018/09/cs4550/notes/09-two-players/notes.html %>
 <div class="row">
   <div class="column">
     <h1 id="index-page">Join a Game</h1>
-    <input type="text" id="game">
-    <button type="submit" onClick="location.href='/game/'+document.getElementById('game').value;">Join game</button>
+    <%= form_for @conn, "/join", [as: :join], fn f -> %>
+      <h3>Your username: <%= text_input f, :user %></h3>
+      <h3>Game name: <%= text_input f, :game %></h3>
+      <h3><%= submit "Join" %>
+    <% end %>
   </div>
 </div>
