@@ -4,8 +4,25 @@ defmodule Memory do
     %{
       cards: resetCards(),
       numClicks: 0,
+      players, %{},
+      pickTurn, "",
     }
   end
+
+  def new(players) do
+    players = Enum.map players, fn {name, info} ->
+      {name, %{ default_player() | score: info.score || 0}}
+    end
+    Map.put(new(), :players, Enum.into(players, %{}))
+  end
+
+  def default_player() do
+    %{
+      score: 0,
+    }
+  end
+
+
 
   # returns a shuffled list of cards.
   # we define a card as a dictionary of: letter, id, completed, and guessed.
@@ -30,12 +47,14 @@ defmodule Memory do
     end
   end
 
-  def client_view(game) do
+  def client_view(game, user) do
     cards = game.cards
     clicks = game.numClicks
+    players = game.players # just send the player list to the client. We can display it later.
     %{
       cards: cards_viewable(cards),
-      numClicks: clicks
+      numClicks: clicks,
+      players: players,
     }
   end
 
