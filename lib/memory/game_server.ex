@@ -24,6 +24,10 @@ defmodule Memory.GameServer do
   def reset_game(game, user) do
     GenServer.call(__MODULE__, {:reset_game, game, user})
   end
+  
+  def add_player(game, user) do
+    GenServer.cast(__MODULE__, {:add_player, game, user})
+  end
 
   ## Implementation
 
@@ -31,28 +35,45 @@ defmodule Memory.GameServer do
     {:ok, state}
   end
 
-  def handle_call({:view, game, user}, _from, state) do
-    newGame = Map.get(state, game, Memory.new)
-    {:reply, Memory.client_view(newGame, user), Map.put(state, game, newGame)}
+  def handle_call({:view, gameName, user}, _from, state) do
+    newGame = Map.get(state, gameName, Memory.new)
+    {:reply, Memory.client_view(newGame, user), Map.put(state, gameName, newGame)}
   end
 
-  def handle_call({:guess_card, game, user, payload}, _from, state) do
-    newGame = Map.get(State, game, Memory.new)
-    |>  Memory.guess_card(user, payload)
+  def handle_call({:guess_card, gameName, user, payload}, _from, state) do
+    newGame = Map.get(state, gameName, Memory.new)
+    #IO.inspect(newGame)
+    newGame = Memory.guess_card(newGame, user, payload)
+    #IO.inspect(newGame)
     newView = Memory.client_view(newGame, user)
-    {:reply, newView, Map.put(state, game, newGame)}
+    IO.inspect(newView)
+    {:reply, newView, Map.put(state, gameName, newGame)}
   end
 
-  def handle_call({:end_guess, game, user}, _from, state) do
-    newGame = Map.get(state, game, Memory.new)
+  def handle_call({:end_guess, gameName, user}, _from, state) do
+    newGame = Map.get(state, gameName, Memory.new)
     |> Memory.end_guess(user)
     newView = Memory.client_view(newGame, user)
-    {:reply, newView, Map.put(state, game, newGame)}
+    {:reply, newView, Map.put(state, gameName, newGame)}
   end
 
-  def handle_call({:reset_game, game, user}, _from, state) do
-    newGame = Memory.reset_game()
+  def handle_call({:reset_game, gameName, user}, _from, state) do
+    newGame = Map.get(state, gameName, Memory.new).players
+    |> Memory.reset_game
     newView = Memory.client_view(newGame, user)
-    {:reply, newView, Map.put(state, game, newGame)}
+    {:reply, newView, Map.put(state, gameName, newGame)}
+  end
+
+  def handle_cast({:add_player, gameName, user}, state) do
+    newGame = Map.get(state, gameName, Memory.new)
+    players = newGame.players
+    IO.inspect(players)
+    if length(players) >= 2 or user in players do
+      # we already have two players, dont add.
+      {:noreply, state}
+    else
+      newGame = Map.put(newGame, :players, [user | players])
+      {:noreply, Map.put(state, gameName, newGame)}
+    end
   end
 end

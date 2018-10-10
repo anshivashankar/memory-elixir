@@ -9,8 +9,9 @@ defmodule MemoryWeb.GamesChannel do
   def join("games:" <> game, payload, socket) do
     if authorized?(payload) do
       socket = assign(socket, :game, game)
-      # TODO add player to server here.
+      GameServer.add_player(game, socket.assigns[:user])
       view = GameServer.view(game, socket.assigns[:user])
+      #broadcast_from! socket, "new_view", view
       {:ok, %{"join" => game, "game" => view}, socket}
     else
       {:error, %{reason: "unauthorized"}}
@@ -28,6 +29,7 @@ defmodule MemoryWeb.GamesChannel do
   # payload should always be a number, the id of the card picked by the client.
   def handle_in("guess_card", payload, socket) do
     view = GameServer.guess_card(socket.assigns[:game], socket.assigns[:user], payload)
+    broadcast_from! socket, "new_view", view
     {:reply, {:ok, %{ "game" => view}}, socket}
     #name = socket.assigns[:name]
     #game = Memory.guess_card(socket.assigns[:game], payload)
@@ -38,6 +40,7 @@ defmodule MemoryWeb.GamesChannel do
 
   def handle_in("end_guess", _, socket) do
     view = GameServer.end_guess(socket.assigns[:game], socket.assigns[:user])
+    broadcast_from! socket, "new_view", view
     {:reply, {:ok, %{ "game" => view}}, socket}
     #name = socket.assigns[:name]
     #game = Memory.end_guess(socket.assigns[:game])
@@ -48,6 +51,7 @@ defmodule MemoryWeb.GamesChannel do
 
   def handle_in("reset_game", _, socket) do
     view = GameServer.reset_game(socket.assigns[:game], socket.assigns[:user])
+    broadcast_from! socket, "new_view", view
     {:reply, {:ok, %{"game" => view}}, socket}
     #name = socket.assigns[:name]
     #game = Memory.reset_game()

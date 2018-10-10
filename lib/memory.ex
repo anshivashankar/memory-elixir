@@ -4,8 +4,9 @@ defmodule Memory do
     %{
       cards: resetCards(),
       numClicks: 0,
-      players, %{},
-      pickTurn, "",
+      players: [],
+      scores: [],
+      pickTurn: 0,
     }
   end
 
@@ -22,8 +23,6 @@ defmodule Memory do
     }
   end
 
-
-
   # returns a shuffled list of cards.
   # we define a card as a dictionary of: letter, id, completed, and guessed.
   def resetCards() do
@@ -38,7 +37,7 @@ defmodule Memory do
     cond do
       # only return when we're out of letters.
       length(letters) == 0 -> Enum.to_list(cardsAcc)
-      true -> 
+      true ->
         card = %{letter: List.first(letters),
                 id: id,
                 completed: false,
@@ -47,14 +46,20 @@ defmodule Memory do
     end
   end
 
-  def client_view(game, user) do
+  def client_view(game, _user) do
     cards = game.cards
     clicks = game.numClicks
-    players = game.players # just send the player list to the client. We can display it later.
+    players = game.players
+    scores = game.scores
+    turn = game.pickTurn
+
+   # just send the player list to the client. We can display it later.
     %{
       cards: cards_viewable(cards),
       numClicks: clicks,
       players: players,
+      scores: scores,
+      pickTurn: turn,
     }
   end
 
@@ -62,7 +67,7 @@ defmodule Memory do
     Enum.map cards, fn (card) ->
       if card.completed || card.guessed do
         card
-      else 
+      else
         %{letter: "??",
         id: card.id,
         completed: false,
@@ -73,17 +78,22 @@ defmodule Memory do
 
   # handles the guessing of a card. Takes in only the ID and game so that the client cant cheat.
   # If two cards have the same letter, update them to be completed.
-  def guess_card(game, id) do
-    if num_guessed(game.cards, 0) >= 2 do
-      # dont do anything if they try to guess more than 2 cards.
-      game
+  def guess_card(game, player, id) do
+
+    if player == Enum.at(game.players, game.pickTurn) do
+      if num_guessed(game.cards, 0) >= 2 do
+        # dont do anything if they try to guess more than 2 cards.
+        game
+      else
+        update_guess(game, id)
+        |> check_completed(id)
+      end
     else
-      update_guess(game, id)
-      |> check_completed(id)
+      game
     end
   end
 
-  # returns the number of guessed cards. 
+  # returns the number of guessed cards.
   defp num_guessed(cards, numGuessed) do
     cond do
       Enum.count(cards) == 0 -> numGuessed
@@ -92,7 +102,7 @@ defmodule Memory do
     end
   end
 
-  # returns the number of completed cards. 
+  # returns the number of completed cards.
   defp num_completed(cards, numCompleted) do
     cond do
       Enum.count(cards) == 0 -> numCompleted
@@ -101,40 +111,55 @@ defmodule Memory do
     end
   end
 
-  # set all guessed to false. 
-  def end_guess(game) do
-    cards = Enum.map game.cards, fn(card) ->
-      %{letter: card.letter,
-      id: card.id,
-      completed: card.completed,
-      guessed: false,}
+  # set all guessed to false.
+  def end_guess(game, player) do
+    # Only let this happen if the active player chooses this
+    if player == Enum.at(game.players, game.pickTurn) do
+      cards = Enum.map game.cards, fn(card) ->
+        %{letter: card.letter,
+        id: card.id,
+        completed: card.completed,
+        guessed: false,}
+        end
+
+      guessedState = Map.put(game, :cards, cards)
+
+      # Change the active player
+      if guessedState.pickTurn == 0 do
+        Map.put(guessedState, :pickTurn, 1)
+      else
+        Map.put(guessedState, :pickTurn, 0)
+      end
+    else
+      game
     end
-    Map.put(game, :cards, cards)
   end
 
   # reset the game.
-  def reset_game() do
+  def reset_game(players) do
     %{
       cards: resetCards(),
-      numClicks: 0
+      numClicks: 0,
+      players: players,
+      scores: [],
+      pickTurn: 0
     }
   end
 
   defp update_guess(game, id) do
-      numClicks = game.numClicks + 1
+      #numClicks = game.numClicks + 1
       gs = MapSet.new(game.cards)
       |> MapSet.to_list
       newCards = find_guessed_card(id, gs)
       |> Enum.sort(&(&1.id < &2.id))
-      newGame = Map.put(game, :cards, newCards)
-      # Update the number of clicks with numClicks.
-      Map.put(newGame, :numClicks, numClicks)
+      Map.put(game, :cards, newCards)
   end
 
   # returns the updated game if the two are a match.
   defp check_completed(game, id) do
     thisCard = Enum.at(game.cards, id)
     newGame = game
+    newScores = List.update_at(game.scores, game.pickTurn, &(&1 + 1))
     #IO.inspect(game)
     # if the match is found, update it.
     newCards = Enum.map game.cards, fn(card) ->
@@ -143,12 +168,14 @@ defmodule Memory do
           %{letter: card.letter,
           id: card.id,
           completed: true,
-          guessed: card.guessed}
+          guessed: card.guessed,
+          scores: newScores,
+          }
         true -> card
       end
     end
     cond do
-      rem(num_completed(newCards, 0), 2) == 1 -> 
+      rem(num_completed(newCards, 0), 2) == 1 ->
         Map.put(newGame, :cards, List.replace_at(newCards, id,
           %{letter: thisCard.letter,
             id: thisCard.id,
