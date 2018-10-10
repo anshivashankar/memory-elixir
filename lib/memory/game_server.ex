@@ -33,7 +33,7 @@ defmodule Memory.GameServer do
 
   def handle_call({:view, game, user}, _from, state) do
     newGame = Map.get(state, game, Memory.new)
-    {:reply, Memory.client_view(game, user), Map.put(state, game, newGame)}
+    {:reply, Memory.client_view(newGame, user), Map.put(state, game, newGame)}
   end
 
   def handle_call({:guess_card, game, user, payload}, _from, state) do
