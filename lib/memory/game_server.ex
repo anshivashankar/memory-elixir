@@ -58,7 +58,8 @@ defmodule Memory.GameServer do
   end
 
   def handle_call({:reset_game, gameName, user}, _from, state) do
-    newGame = Memory.reset_game()
+    newGame = Map.get(state, gameName, Memory.new).players
+    |> Memory.reset_game
     newView = Memory.client_view(newGame, user)
     {:reply, newView, Map.put(state, gameName, newGame)}
   end

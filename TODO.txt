@@ -1,0 +1,6 @@
+Stuff to do left:
+  - Clean up the active players UI. (they are appended together, make a list thingy instead)
+  - Fix the scoring system, doesn't seem to work, no win state.
+  - Dont allow the game to start unless there are two players.
+  - Fix the fact that the second player goes first.
+  - Add a button that allows you to go back to the lobby.

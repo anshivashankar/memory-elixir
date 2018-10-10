@@ -130,15 +130,19 @@ defmodule Memory do
       else
         Map.put(guessedState, :pickTurn, 0)
       end
+    else
+      game
     end
   end
 
   # reset the game.
-  def reset_game() do
+  def reset_game(players) do
     %{
       cards: resetCards(),
       numClicks: 0,
-      pickTurn: 0,
+      players: players,
+      scores: [],
+      pickTurn: 0
     }
   end
 
