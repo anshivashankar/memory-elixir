@@ -48,7 +48,7 @@ defmodule Memory do
     end
   end
 
-  def client_view(game, user) do
+  def client_view(game, _user) do
     cards = game.cards
     clicks = game.numClicks
     players = game.players
@@ -91,9 +91,8 @@ defmodule Memory do
         |> check_completed(id)
       end
     else
-
+      game
     end
-
   end
 
   # returns the number of guessed cards.
@@ -153,13 +152,12 @@ defmodule Memory do
   end
 
   defp update_guess(game, id) do
-      numClicks = game.numClicks + 1
+      #numClicks = game.numClicks + 1
       gs = MapSet.new(game.cards)
       |> MapSet.to_list
       newCards = find_guessed_card(id, gs)
       |> Enum.sort(&(&1.id < &2.id))
-      newGame = Map.put(game, :cards, newCards)
-
+      Map.put(game, :cards, newCards)
   end
 
   # returns the updated game if the two are a match.

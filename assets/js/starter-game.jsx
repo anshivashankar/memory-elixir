@@ -6,14 +6,13 @@ export default function game_init(root, channel) {
   ReactDOM.render(<Memory channel={channel} />, root);
 }
 
-
 class Memory extends React.Component {
 
   constructor(props) {
     super(props);
 
     this.channel = props.channel;
-    this.state = { cards: this.resetCards(), numClicks: 0, players: [] };
+    this.state = { cards: this.resetCards(), numClicks: 0, players: [], scores: [], pickTurn:0 };
     this.channel.join()
       .receive("ok", this.gotView.bind(this))
       .receive("error", resp => {console.log("Unable to join", resp)});
@@ -63,7 +62,8 @@ class Memory extends React.Component {
 
   check_game_over() {
     var gameOver = true
-    for (int i = 0; i < 15; i++) {
+    let i;
+    for (i = 0; i < 15; i++) {
       var card = this.state.card[id]
       var completed = card.completed;
       gameOver = gameOver && completed
@@ -73,11 +73,12 @@ class Memory extends React.Component {
   }
 
   getWinner() {
-    if (check_game_over) {
-      if this.state.scores[0] > this.state.scores[1] {
+    if (this.check_game_over) {
+      console.log(this.state)
+      if (this.state.scores[0] > this.state.scores[1]) {
         return this.state.players[0]
       }
-      else if this.state.scores[1] > this.state.scores[0] {
+      else if (this.state.scores[1] > this.state.scores[0]) {
         return this.state.players[1]
       }
       else {
@@ -90,14 +91,14 @@ class Memory extends React.Component {
   }
 
   renderWinner() {
-    winnerName = this.getWinner()
-    if winnerName == "TIE" {
+    let winnerName = this.getWinner()
+    if (winnerName == "TIE") {
       return
       <h1>
         It's a Tie! You both Win!
       </h1>
     }
-    else if winnerName != "NONE" {
+    else if (winnerName != "NONE") {
       return
       <h1>
         {winnerName} is the winner!
@@ -148,18 +149,16 @@ class Memory extends React.Component {
 
   renderCard(i) {
     let card = this.state.cards[i];
-    return <DisplayCard number={i}
+    return (<DisplayCard number={i}
                         card = {card}
-                        clickCard={this.onClickCard.bind(this)} />;
+                        clickCard={this.onClickCard.bind(this)} />);
   }
 
   renderPlayer(index) {
-    if index < this.state.players.length {
-      return
-      <span>
-        {this.state.players[index]}
-      </span>
-    }
+    return (
+    <span>
+      {this.state.players[index]}
+    </span>);
   }
 
 
@@ -167,7 +166,7 @@ class Memory extends React.Component {
     return (
     <div>
       <div className="column">
-        {renderWinner()}
+        {this.renderWinner()}
       </div>
       <div>
         Active Players:

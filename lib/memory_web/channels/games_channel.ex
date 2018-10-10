@@ -10,6 +10,7 @@ defmodule MemoryWeb.GamesChannel do
     if authorized?(payload) do
       socket = assign(socket, :game, game)
       # TODO add player to server here.
+      GameServer.add_player(game, socket.assigns[:user])
       view = GameServer.view(game, socket.assigns[:user])
       {:ok, %{"join" => game, "game" => view}, socket}
     else
