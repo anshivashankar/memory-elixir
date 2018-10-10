@@ -51,12 +51,10 @@ defmodule Memory do
   def client_view(game, user) do
     cards = game.cards
     clicks = game.numClicks
+    players = game.players
 
     if length(game.players) < 2 do
       players = [user | game.players]
-
-    else
-      players = game.players
     end
 
    # just send the player list to the client. We can display it later.
