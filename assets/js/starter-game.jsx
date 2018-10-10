@@ -11,7 +11,7 @@ class Memory extends React.Component {
 
   constructor(props) {
     super(props);
-    
+
     this.channel = props.channel;
     this.state = { cards: this.resetCards(), numClicks: 0, players: [] };
     this.channel.join()
@@ -52,7 +52,7 @@ class Memory extends React.Component {
 
   onClickCard(id, index) {
     // do nothing on click if the cards are completed.
-    if(this.state.cards[id].completed || 
+    if(this.state.cards[id].completed ||
        this.getNumberOfGuesses() == 2 ||
        this.state.cards[id].guessed) {
       return;
@@ -60,6 +60,51 @@ class Memory extends React.Component {
     this.sendGuess(id);
     this.cardMatch(id);
   }
+
+  check_game_over() {
+    var gameOver = true
+    for (int i = 0; i < 15; i++) {
+      var card = this.state.card[id]
+      var completed = card.completed;
+      gameOver = gameOver && completed
+    }
+
+    return gameOver
+  }
+
+  getWinner() {
+    if (check_game_over) {
+      if this.state.scores[0] > this.state.scores[1] {
+        return this.state.players[0]
+      }
+      else if this.state.scores[1] > this.state.scores[0] {
+        return this.state.players[1]
+      }
+      else {
+        return "TIE"
+      }
+    }
+    else {
+      return "NONE"
+    }
+  }
+
+  renderWinner() {
+    winnerName = this.getWinner()
+    if winnerName == "TIE" {
+      return
+      <h1>
+        It's a Tie! You both Win!
+      </h1>
+    }
+    else if winnerName != "NONE" {
+      return
+      <h1>
+        {winnerName} is the winner!
+      </h1>
+    }
+  }
+
 
   // sends the "I am done looking" channel push.
   cardMatch(id) {
@@ -75,13 +120,13 @@ class Memory extends React.Component {
           .receive("ok", this.gotView.bind(this));
       },1000);
   }
-  
+
   // if there's a card that's guessed, return its index.
   // if there is no other card that's guessed, return -1.
   findGuessed(card) {
     let i;
     for(i = 0; i != 16; i++) {
-      if (this.state.cards[i].guessed == true && 
+      if (this.state.cards[i].guessed == true &&
           !(_.isEqual(this.state.cards[i].id, card.id))) {
         return i;
       }
@@ -103,14 +148,32 @@ class Memory extends React.Component {
 
   renderCard(i) {
     let card = this.state.cards[i];
-    return <DisplayCard number={i} 
+    return <DisplayCard number={i}
                         card = {card}
                         clickCard={this.onClickCard.bind(this)} />;
   }
 
+  renderPlayer(index) {
+    if index < this.state.players.length {
+      return
+      <span>
+        {this.state.players[index]}
+      </span>
+    }
+  }
+
+
   render() {
     return (
     <div>
+      <div className="column">
+        {renderWinner()}
+      </div>
+      <div>
+        Active Players:
+        {this.renderPlayer(0)}
+        {this.renderPlayer(1)}
+      </div>
       <div className="column">
         <button onClick={this.resetState.bind(this)}>Reset</button>
       </div>
@@ -150,7 +213,7 @@ class Memory extends React.Component {
 }
 
 
-// When we display a card, we should use each 
+// When we display a card, we should use each
 function DisplayCard(params) {
   let letter = params.card.letter;
   let flipped = params.card.guessed || params.card.completed;
@@ -160,4 +223,3 @@ function DisplayCard(params) {
   }
   return <button className="buttonGuess" onClick={() => params.clickCard(id, params.number)}> [??] </button>;
 }
-

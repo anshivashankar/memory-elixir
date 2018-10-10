@@ -55,10 +55,6 @@ defmodule Memory do
     scores = game.scores
     turn = game.pickTurn
 
-    if length(game.players) < 2 and not Enum.member?(game.players, user) do
-      players = [user | game.players]
-    end
-
    # just send the player list to the client. We can display it later.
     %{
       cards: cards_viewable(cards),
