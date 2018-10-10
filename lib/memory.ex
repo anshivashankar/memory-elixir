@@ -4,8 +4,8 @@ defmodule Memory do
     %{
       cards: resetCards(),
       numClicks: 0,
-      players: %{},
-      scores: %{},
+      players: [],
+      scores: [],
       pickTurn: 0,
     }
   end
@@ -52,8 +52,10 @@ defmodule Memory do
     cards = game.cards
     clicks = game.numClicks
     players = game.players
+    scores = game.scores
+    turn = game.pickTurn
 
-    if length(game.players) < 2 do
+    if length(game.players) < 2 and not Enum.member?(game.players, user) do
       players = [user | game.players]
     end
 
@@ -62,6 +64,8 @@ defmodule Memory do
       cards: cards_viewable(cards),
       numClicks: clicks,
       players: players,
+      scores: scores,
+      pickTurn: turn,
     }
   end
 
@@ -90,6 +94,8 @@ defmodule Memory do
         update_guess(game, id)
         |> check_completed(id)
       end
+    else
+
     end
 
   end
@@ -124,13 +130,13 @@ defmodule Memory do
 
         end
 
-      Map.put(game, :cards, cards)
+      guessedState = Map.put(game, :cards, cards)
 
       # Change the active player
-      if game.pickTurn == 0 do
-        Map.put(game, :pickTurn, 1)
+      if guessedState.pickTurn == 0 do
+        Map.put(guessedState, :pickTurn, 1)
       else
-        Map.put(game, :pickTurn, 0)
+        Map.put(guessedState, :pickTurn, 0)
       end
     end
 
@@ -158,18 +164,13 @@ defmodule Memory do
       |> Enum.sort(&(&1.id < &2.id))
       newGame = Map.put(game, :cards, newCards)
 
-      #Update this player's score
-      newPlayerScore = Enum.at(game.scores, game.pickTurn) + 1
-      newGame2 = Map.put(newGame, :scores, newPlayerScore)
-
-      # Update the number of clicks with numClicks.
-      Map.put(newGame2, :numClicks, numClicks)
   end
 
   # returns the updated game if the two are a match.
   defp check_completed(game, id) do
     thisCard = Enum.at(game.cards, id)
     newGame = game
+    newScores = List.update_at(game.scores, game.pickTurn, &(&1 + 1))
     #IO.inspect(game)
     # if the match is found, update it.
     newCards = Enum.map game.cards, fn(card) ->
@@ -178,7 +179,9 @@ defmodule Memory do
           %{letter: card.letter,
           id: card.id,
           completed: true,
-          guessed: card.guessed}
+          guessed: card.guessed,
+          scores: newScores,
+          }
         true -> card
       end
     end
