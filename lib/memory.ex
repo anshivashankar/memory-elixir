@@ -23,8 +23,6 @@ defmodule Memory do
     }
   end
 
-
-
   # returns a shuffled list of cards.
   # we define a card as a dictionary of: letter, id, completed, and guessed.
   def resetCards() do
@@ -122,7 +120,6 @@ defmodule Memory do
         id: card.id,
         completed: card.completed,
         guessed: false,}
-
         end
 
       guessedState = Map.put(game, :cards, cards)
@@ -134,12 +131,6 @@ defmodule Memory do
         Map.put(guessedState, :pickTurn, 0)
       end
     end
-
-
-
-
-
-
   end
 
   # reset the game.
