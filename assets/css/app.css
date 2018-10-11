@@ -25,3 +25,7 @@
   color: black;
   background-color: white;
 }
+
+#activePlayer {
+  font-weight: bold;
+}

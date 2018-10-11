@@ -70,16 +70,15 @@ class Memory extends React.Component {
     var gameOver = true
     let i;
     for (i = 0; i < 15; i++) {
-      var card = this.state.card[id]
+      var card = this.state.cards[i]
       var completed = card.completed;
-      gameOver = gameOver && completed
+      gameOver = gameOver && completed;
     }
-
     return gameOver
   }
 
   getWinner() {
-    if (this.check_game_over) {
+    if (this.check_game_over()) {
       //console.log(this.state)
       if (this.state.scores[0] > this.state.scores[1]) {
         return this.state.players[0]
@@ -99,16 +98,10 @@ class Memory extends React.Component {
   renderWinner() {
     let winnerName = this.getWinner()
     if (winnerName == "TIE") {
-      return
-      <h1>
-        It's a Tie! You both Win!
-      </h1>
+      return "It's a TIE! You both win!"
     }
     else if (winnerName != "NONE") {
-      return
-      <h1>
-        {winnerName} is the winner!
-      </h1>
+      return "The winner is: " + winnerName + "!";
     }
   }
 
@@ -160,10 +153,21 @@ class Memory extends React.Component {
   }
 
   renderPlayer(index) {
-    return (
-    <span>
-      {this.state.players[index]}
-    </span>);
+
+    if (index == this.state.pickTurn) {
+      return (
+      <span id="activePlayer">
+        {this.state.players[index]}: {this.state.scores[index]}
+        <br/>
+      </span>);
+    }
+    else {
+      return (
+      <span>
+        {this.state.players[index]}: {this.state.scores[index]}
+        <br/>
+      </span>);
+    }
   }
 
 
@@ -171,10 +175,11 @@ class Memory extends React.Component {
     return (
     <div>
       <div className="column">
-        {this.renderWinner()}
+        <h1>{this.renderWinner()} </h1>
+        <a href="/"> Click Here to Return to Lobby</a>
       </div>
       <div>
-        Active Players:
+        Active Players: <br />
         {this.renderPlayer(0)}
         {this.renderPlayer(1)}
       </div>

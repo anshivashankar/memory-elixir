@@ -15,7 +15,7 @@ defmodule Memory.GameServer do
   def guess_card(game, user, payload) do
     GenServer.call(__MODULE__, {:guess_card, game, user, payload})
   end
-  
+
 
   def end_guess(game, user) do
     GenServer.call(__MODULE__, {:end_guess, game, user})
@@ -24,7 +24,7 @@ defmodule Memory.GameServer do
   def reset_game(game, user) do
     GenServer.call(__MODULE__, {:reset_game, game, user})
   end
-  
+
   def add_player(game, user) do
     GenServer.cast(__MODULE__, {:add_player, game, user})
   end
@@ -72,7 +72,7 @@ defmodule Memory.GameServer do
       # we already have two players, dont add.
       {:noreply, state}
     else
-      newGame = Map.put(newGame, :players, [user | players])
+      newGame = Map.put(newGame, :players, players ++ [user])
       {:noreply, Map.put(state, gameName, newGame)}
     end
   end

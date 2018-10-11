@@ -5,7 +5,7 @@ defmodule Memory do
       cards: resetCards(),
       numClicks: 0,
       players: [],
-      scores: [],
+      scores: [0, 0],
       pickTurn: 0,
     }
   end
@@ -79,7 +79,6 @@ defmodule Memory do
   # handles the guessing of a card. Takes in only the ID and game so that the client cant cheat.
   # If two cards have the same letter, update them to be completed.
   def guess_card(game, player, id) do
-
     if player == Enum.at(game.players, game.pickTurn) do
       if num_guessed(game.cards, 0) >= 2 do
         # dont do anything if they try to guess more than 2 cards.
@@ -141,7 +140,7 @@ defmodule Memory do
       cards: resetCards(),
       numClicks: 0,
       players: players,
-      scores: [],
+      scores: [0,0],
       pickTurn: 0
     }
   end
@@ -160,6 +159,7 @@ defmodule Memory do
     thisCard = Enum.at(game.cards, id)
     newGame = game
     newScores = List.update_at(game.scores, game.pickTurn, &(&1 + 1))
+
     #IO.inspect(game)
     # if the match is found, update it.
     newCards = Enum.map game.cards, fn(card) ->
@@ -169,14 +169,14 @@ defmodule Memory do
           id: card.id,
           completed: true,
           guessed: card.guessed,
-          scores: newScores,
           }
         true -> card
       end
     end
     cond do
       rem(num_completed(newCards, 0), 2) == 1 ->
-        Map.put(newGame, :cards, List.replace_at(newCards, id,
+        newGame2 = Map.put(newGame, :scores, newScores)
+        Map.put(newGame2, :cards, List.replace_at(newCards, id,
           %{letter: thisCard.letter,
             id: thisCard.id,
             completed: true,
