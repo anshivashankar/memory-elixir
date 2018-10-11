@@ -186,9 +186,6 @@ class Memory extends React.Component {
         <h2>Memory Game</h2>
       </div>
       <div className="row">
-        <p>Number of guesses: {this.state.numClicks}</p>
-      </div>
-      <div className="row">
         {this.renderCard(0)}
         {this.renderCard(1)}
         {this.renderCard(2)}
