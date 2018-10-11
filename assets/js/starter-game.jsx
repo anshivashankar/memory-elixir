@@ -17,10 +17,7 @@ class Memory extends React.Component {
       .receive("ok", this.gotView.bind(this))
       .receive("error", resp => {console.log("Unable to join", resp)});
     this.channel.on("new_view", state => {
-      console.log("broadcast", state);
       this.setState(state);
-      //this.gotView(state);
-      //this.setState(state.game);
     });
   }
 
@@ -79,7 +76,6 @@ class Memory extends React.Component {
 
   getWinner() {
     if (this.check_game_over()) {
-      //console.log(this.state)
       if (this.state.scores[0] > this.state.scores[1]) {
         return this.state.players[0]
       }

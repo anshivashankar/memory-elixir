@@ -160,7 +160,6 @@ defmodule Memory do
     newGame = game
     newScores = List.update_at(game.scores, game.pickTurn, &(&1 + 1))
 
-    #IO.inspect(game)
     # if the match is found, update it.
     newCards = Enum.map game.cards, fn(card) ->
       cond do

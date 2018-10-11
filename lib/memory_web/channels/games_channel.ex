@@ -11,7 +11,6 @@ defmodule MemoryWeb.GamesChannel do
       socket = assign(socket, :game, game)
       GameServer.add_player(game, socket.assigns[:user])
       view = GameServer.view(game, socket.assigns[:user])
-      #broadcast_from! socket, "new_view", view
       {:ok, %{"join" => game, "game" => view}, socket}
     else
       {:error, %{reason: "unauthorized"}}
@@ -31,33 +30,18 @@ defmodule MemoryWeb.GamesChannel do
     view = GameServer.guess_card(socket.assigns[:game], socket.assigns[:user], payload)
     broadcast_from! socket, "new_view", view
     {:reply, {:ok, %{ "game" => view}}, socket}
-    #name = socket.assigns[:name]
-    #game = Memory.guess_card(socket.assigns[:game], payload)
-    #socket = assign(socket, :game, game)
-    #BackupAgent.put(name, game)
-    #{:reply, {:ok, %{ "game" => Memory.client_view(game)}}, socket}
   end
 
   def handle_in("end_guess", _, socket) do
     view = GameServer.end_guess(socket.assigns[:game], socket.assigns[:user])
     broadcast_from! socket, "new_view", view
     {:reply, {:ok, %{ "game" => view}}, socket}
-    #name = socket.assigns[:name]
-    #game = Memory.end_guess(socket.assigns[:game])
-    #socket = assign(socket, :game, game)
-    #BackupAgent.put(name, game)
-    #{:reply, {:ok, %{ "game" => Memory.client_view(game)}}, socket}
   end
 
   def handle_in("reset_game", _, socket) do
     view = GameServer.reset_game(socket.assigns[:game], socket.assigns[:user])
     broadcast_from! socket, "new_view", view
     {:reply, {:ok, %{"game" => view}}, socket}
-    #name = socket.assigns[:name]
-    #game = Memory.reset_game()
-    #socket = assign(socket, :game, game)
-    #BackupAgent.put(name, game)
-    #{:reply, {:ok, %{ "game" => Memory.client_view(game)}}, socket}
   end
 
   # Add authorization logic here as required.

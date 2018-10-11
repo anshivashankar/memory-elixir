@@ -42,11 +42,8 @@ defmodule Memory.GameServer do
 
   def handle_call({:guess_card, gameName, user, payload}, _from, state) do
     newGame = Map.get(state, gameName, Memory.new)
-    #IO.inspect(newGame)
     newGame = Memory.guess_card(newGame, user, payload)
-    #IO.inspect(newGame)
     newView = Memory.client_view(newGame, user)
-    IO.inspect(newView)
     {:reply, newView, Map.put(state, gameName, newGame)}
   end
 
@@ -67,7 +64,6 @@ defmodule Memory.GameServer do
   def handle_cast({:add_player, gameName, user}, state) do
     newGame = Map.get(state, gameName, Memory.new)
     players = newGame.players
-    IO.inspect(players)
     if length(players) >= 2 or user in players do
       # we already have two players, dont add.
       {:noreply, state}
